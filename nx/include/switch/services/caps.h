@@ -27,11 +27,20 @@ typedef enum {
     CapsAlbumStorage_Sd   = 1,                  ///< Sd
 } CapsAlbumStorage;
 
+/// AlbumFileContents
+typedef enum {
+    CapsAlbumFileContents_ScreenShot      = 0,
+    CapsAlbumFileContents_Movie           = 1,
+    CapsAlbumFileContents_ExtraScreenShot = 2,
+    CapsAlbumFileContents_ExtraMovie      = 3,
+} CapsAlbumFileContents;
+
 /// ContentType
 typedef enum {
-    CapsContentType_Screenshot = 0,             ///< Album screenshots.
-    CapsContentType_Movie      = 1,             ///< Album videos.
-    CapsContentType_ExtraMovie = 3,             ///< Videos recorded by the current host Application via \ref grcCreateMovieMaker.
+    CapsContentType_Screenshot      = 0,             ///< Album screenshots.
+    CapsContentType_Movie           = 1,             ///< Album videos.
+    CapsContentType_ExtraScreenShot = 3,             ///< Image captured by the current host Application.
+    CapsContentType_ExtraMovie      = 3,             ///< Videos recorded by the current host Application via \ref grcCreateMovieMaker.
 } CapsContentType;
 
 /// ScreenShotAttribute
@@ -138,14 +147,6 @@ typedef struct {
     u8 userdata[0x400];                         ///< UserData.
     u32 size;                                   ///< UserData size.
 } CapsApplicationData;
-
-/// AlbumFileContents
-typedef enum {
-    CapsAlbumFileContents_ScreenShot      = 0,
-    CapsAlbumFileContents_Movie           = 1,
-    CapsAlbumFileContents_ExtraScreenShot = 2,
-    CapsAlbumFileContents_ExtraMovie      = 3,
-} CapsAlbumFileContents;
 
 typedef enum {
     CapsAlbumContentsUsageFlag_HasGreaterUsage   = BIT(0), ///< Indicates that there are additional files not captured by the count/size fields of CapsAlbumContentsUsage

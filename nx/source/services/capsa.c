@@ -340,7 +340,7 @@ Result capsaGetAlbumCache(CapsAlbumStorage storage, CapsAlbumCache *cache) {
     return serviceDispatchInOut(&g_capsaSrv, 8012, inval, *cache);
 }
 
-Result capsaGetAlbumCacheEx(CapsAlbumStorage storage, CapsAlbumFileContents contents, CapsAlbumCache *cache) {
+Result capsaGetAlbumCacheEx(CapsAlbumStorage storage, CapsContentType contents, CapsAlbumCache *cache) {
     if (hosversionBefore(4,0,0))
         return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
     struct {

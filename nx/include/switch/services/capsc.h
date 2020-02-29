@@ -71,10 +71,10 @@ Result capscCheckApplicationIdRegistered(u64 application_id);
  * @brief Generate an AlbumFileId based on parameters and current time.
  * @param[in] application_id ApplicationId.
  * @note Only available on [2.0.0+].
- * @param[in] contents \ref CapsAlbumFileContents
+ * @param[in] type \ref CapsContentType
  * @param[out] file_id \ref CapsAlbumFileId
  */
-Result capscGenerateCurrentAlbumFileId(u64 application_id, CapsAlbumFileContents contents, CapsAlbumFileId *file_id);
+Result capscGenerateCurrentAlbumFileId(u64 application_id, CapsContentType type, CapsAlbumFileId *file_id);
 
 /**
  * @brief Generate an ApplicationAlbumEntry based on parameters.

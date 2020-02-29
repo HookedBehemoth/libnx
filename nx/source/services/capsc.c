@@ -86,7 +86,7 @@ Result capscCheckApplicationIdRegistered(u64 application_id) {
     return serviceDispatchIn(&g_capscSrv, 2014, application_id);
 }
 
-Result capscGenerateCurrentAlbumFileId(u64 application_id, CapsAlbumFileContents contents, CapsAlbumFileId *file_id) {
+Result capscGenerateCurrentAlbumFileId(u64 application_id, CapsContentType contents, CapsAlbumFileId *file_id) {
     if (hosversionBefore(2,0,0))
         return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
     const struct {

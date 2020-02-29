@@ -187,7 +187,7 @@ Result capsaGetAlbumMountResult(CapsAlbumStorage storage);
  * @brief Returns the AlbumUsage for a specified \ref CapsAlbumStorage.
  * @note Only available on [4.0.0+].
  * @param[in] storage \ref CapsAlbumStorage
- * @param[in] flags \ref CapsAlbumFileContentsFlag
+ * @param[in] flags \ref CapsContentTypeFlag
  * @param[out] out \ref CapsAlbumUsage16
  */
 Result capsaGetAlbumUsage16(CapsAlbumStorage storage, u8 flags, CapsAlbumUsage16 *out);
@@ -205,7 +205,7 @@ Result capsaGetMinMaxAppletId(bool* success, u64* min, u64* max);
  * @brief Gets the amount of files of the specified type at a AlbumStorage.
  * @note Only available on [5.0.0+].
  * @param[in] storage \ref CapsAlbumStorage
- * @param[in] flags \ref CapsAlbumFileContentsFlag
+ * @param[in] flags \ref CapsContentTypeFlag
  * @param[out] count Amount of files.
  */
 Result capsaGetAlbumFileCountEx0(CapsAlbumStorage storage, u8 flags, u64 *count);
@@ -214,7 +214,7 @@ Result capsaGetAlbumFileCountEx0(CapsAlbumStorage storage, u8 flags, u64 *count)
  * @brief Gets a listing of \ref CapsAlbumEntry, where the AlbumFile's storage and type matches the input one.
  * @note Only available on [5.0.0+].
  * @param[in] storage \ref CapsAlbumStorage
- * @param[in] flags \ref CapsAlbumFileContentsFlag
+ * @param[in] flags \ref CapsContentTypeFlag
  * @param[out] out Total output entries.
  * @param[out] entries Output array of \ref CapsAlbumEntry.
  * @param[in] count Reserved entry count.
@@ -327,10 +327,10 @@ Result capsaGetAlbumCache(CapsAlbumStorage storage, CapsAlbumCache *cache);
 /**
  * @brief Gets the AlbumCache for the specified type of the specified AlbumStorage.
  * @param[in] storage \ref CapsAlbumStorage
- * @param[in] contents \ref CapsAlbumFileContents
+ * @param[in] type \ref CapsContentType
  * @param[out] cache \ref CapsAlbumCache
  */
-Result capsaGetAlbumCacheEx(CapsAlbumStorage storage, CapsAlbumFileContents contents, CapsAlbumCache *cache);
+Result capsaGetAlbumCacheEx(CapsAlbumStorage storage, CapsContentType type, CapsAlbumCache *cache);
 
 /**
  * @brief Load an \ref CapsAlbumEntry from a \ref CapsApplicationAlbumEntry and an AppletResourceUserId.
