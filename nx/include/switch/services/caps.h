@@ -93,7 +93,7 @@ typedef struct {
 
 /// AlbumEntry
 typedef struct {
-    u64 size;                                   ///< Size.
+    s64 size;                                   ///< Size.
     CapsAlbumFileId file_id;                    ///< \ref CapsAlbumFileId
 } CapsAlbumEntry;
 
@@ -107,7 +107,7 @@ typedef struct {
         } v0; ///< Pre-7.0.0
 
         struct {
-            u64 size;                           ///< size of the entry
+            s64 size;                           ///< size of the entry
             u64 hash;                           ///< aes256 with hardcoded key over \ref AlbumEntry.
             CapsAlbumFileDateTime datetime;     ///< \ref CapsAlbumFileDateTime
             u8 storage;                         ///< \ref CapsAlbumStorage
@@ -190,8 +190,10 @@ typedef struct {
 
 /// AlbumFileContentsFlag
 typedef enum {
-    CapsAlbumFileContentsFlag_ScreenShot = BIT(0),        ///< Query for ScreenShot files.
-    CapsAlbumFileContentsFlag_Movie      = BIT(1),        ///< Query for Movie files.
+    CapsAlbumFileContentsFlag_ScreenShot      = BIT(0),   ///< Query for ScreenShot files.
+    CapsAlbumFileContentsFlag_Movie           = BIT(1),   ///< Query for Movie files.
+    CapsAlbumFileContentsFlag_ExtraScreenShot = BIT(2),   ///< Query for ScreenShot files.
+    CapsAlbumFileContentsFlag_ExtraMovie      = BIT(3),   ///< Query for Movie files.
 } CapsAlbumFileContentsFlag;
 
 /// AlbumCache

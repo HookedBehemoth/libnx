@@ -4,7 +4,7 @@
 #include "runtime/hosversion.h"
 
 u64 capsGetShimLibraryVersion(void) {
-    u64 version=1; // [7.0.0-8.1.0]
+    u64 version=1; // [7.0.0-9.1.0]
 
     return version;
 }
