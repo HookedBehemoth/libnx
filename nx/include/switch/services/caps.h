@@ -40,7 +40,15 @@ typedef struct {
     u32 orientation;                            ///< \ref AlbumImageOrientation
     u32 unk_x8;                                 ///< Always set to 0 by official sw.
     u32 unk_xc;                                 ///< Always set to 1 by official sw.
-    u8 unk_x10[0x30];                           ///< Always set to 0 by official sw.
+    u32 unk_x10;                                ///< Unknown.
+    u32 unk_x14;                                ///< Unknown.
+    u32 unk_x18;                                ///< Unknown.
+    u32 unk_x1c;                                ///< Unknown.
+    u16 unk_x20;                                ///< Unknown.
+    u16 unk_x22;                                ///< Unknown.
+    u16 unk_x24;                                ///< Unknown.
+    u16 unk_x26;                                ///< Unknown.
+    u64 reserved[3];                            ///< Always zero.
 } CapsScreenShotAttribute;
 
 /// ScreenShotAttributeForApplication. Only unk_x0 is used by official sw.
@@ -60,7 +68,7 @@ typedef struct {
     u16 unk_x22;                                ///< Unknown.
     u16 unk_x24;                                ///< Unknown.
     u16 unk_x26;                                ///< Unknown.
-    u8 reserved[0x18];                          ///< Always zero.
+    u64 reserved[3];                            ///< Always zero.
 } CapsScreenShotAttributeForApplication;
 
 /// ScreenShotDecodeOption
