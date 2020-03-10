@@ -1,6 +1,4 @@
 #define NX_SERVICE_ASSUME_NON_DOMAIN
-#include <string.h>
-#include <time.h>
 #include "service_guard.h"
 #include "runtime/hosversion.h"
 #include "services/applet.h"
@@ -57,7 +55,7 @@ static Result _capsuSetShimLibraryVersion(u64 version) {
     );
 }
 
-static Result _capsuGetAlbumFileList0AafeAruidDeprecated(void* entries, size_t entrysize, s32 count, u8 type, u64 start_timestamp, u64 end_timestamp, s32 *total_entries) {
+Result capsuGetAlbumFileList0AafeAruid(CapsApplicationAlbumFileEntry* entries, s32 count, CapsContentType type, u64 start_timestamp, u64 end_timestamp, s32 *total_entries) {
     const struct {
         u8 type;
         u8 pad[7];
@@ -69,14 +67,14 @@ static Result _capsuGetAlbumFileList0AafeAruidDeprecated(void* entries, size_t e
     u64 total_out=0;
     Result rc = serviceDispatchInOut(&g_capsuSrv, 102, in, total_out,
         .buffer_attrs = { SfBufferAttr_HipcMapAlias | SfBufferAttr_Out },
-        .buffers = { { entries, count*entrysize } },
+        .buffers = { { entries, count*sizeof(CapsApplicationAlbumFileEntry) } },
         .in_send_pid = true,
     );
     if (R_SUCCEEDED(rc) && total_entries) *total_entries = total_out;
     return rc;
 }
 
-static Result _capsuDeleteAlbumFileByAruid(u32 cmd_id, u8 type, const CapsApplicationAlbumFileEntry *entry) {
+Result capsuDeleteAlbumFileByAruid(CapsContentType type, const CapsApplicationAlbumFileEntry *entry) {
     const struct {
         u8 type;
         u8 pad[7];
@@ -89,7 +87,7 @@ static Result _capsuDeleteAlbumFileByAruid(u32 cmd_id, u8 type, const CapsApplic
     );
 }
 
-static Result _capsuGetAlbumFileSizeByAruid(const CapsApplicationAlbumFileEntry *entry, u64 *size) {
+Result capsuGetAlbumFileSizeByAruid(const CapsApplicationAlbumFileEntry *entry, u64 *size) {
     const struct {
         CapsApplicationAlbumFileEntry entry;
         u64 AppletResourceUserId;
@@ -100,20 +98,18 @@ static Result _capsuGetAlbumFileSizeByAruid(const CapsApplicationAlbumFileEntry 
     );
 }
 
-static Result _capsuPrecheckToCreateContentsByAruid(u8 type, u64 unk) {
+Result capsuDeleteAlbumFileByAruidForDebug(const CapsApplicationAlbumFileEntry *entry) {
     const struct {
-        u8 type;
-        u8 pad[7];
-        u64 unk;
+        CapsApplicationAlbumFileEntry entry;
         u64 AppletResourceUserId;
-    } in = { type, {0}, unk, appletGetAppletResourceUserId() };
+    } in = { *entry, appletGetAppletResourceUserId() };
 
-    return serviceDispatchIn(&g_capsuSrv, 130, in,
+    return serviceDispatchIn(&g_capsuSrv, 105, in,
         .in_send_pid = true,
     );
 }
 
-static Result _capsuLoadAlbumScreenShotImageByAruid(u32 cmd_id, CapsLoadAlbumScreenShotImageOutputForApplication *out, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
+static Result _capsuLoadAlbumScreenShot(u32 cmd_id, CapsLoadAlbumScreenShotImageOutputForApplication *out, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
     const struct {
         CapsApplicationAlbumFileEntry entry;
         CapsScreenShotDecodeOption option;
@@ -135,7 +131,28 @@ static Result _capsuLoadAlbumScreenShotImageByAruid(u32 cmd_id, CapsLoadAlbumScr
     );
 }
 
-static Result _capsuGetAlbumFileListAaeAruid(u32 cmd_id, void* entries, size_t entrysize, s32 count, u8 type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, s32 *total_entries) {
+Result capsuLoadAlbumScreenShotImage(CapsLoadAlbumScreenShotImageOutputForApplication *out, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
+    return _capsuLoadAlbumScreenShot(110, out, image, image_size, workbuf, workbuf_size, entry, option);
+}
+
+Result capsuLoadAlbumScreenShotThumbnailImage(CapsLoadAlbumScreenShotImageOutputForApplication *out, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
+    return _capsuLoadAlbumScreenShot(120, out, image, image_size, workbuf, workbuf_size, entry, option);
+}
+
+Result capsuPrecheckToCreateContentsByAruid(CapsContentType type, u64 unk) {
+    const struct {
+        u8 type;
+        u8 pad[7];
+        u64 unk;
+        u64 AppletResourceUserId;
+    } in = { type, {0}, unk, appletGetAppletResourceUserId() };
+
+    return serviceDispatchIn(&g_capsuSrv, 130, in,
+        .in_send_pid = true,
+    );
+}
+
+static Result _capsuGetAlbumFileList(u32 cmd_id, void* entries, size_t entrysize, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, s32 *total_entries) {
     const struct {
         u8 type;
         u8 pad;
@@ -143,7 +160,7 @@ static Result _capsuGetAlbumFileListAaeAruid(u32 cmd_id, void* entries, size_t e
         CapsAlbumFileDateTime end_datetime;
         u8 pad2[6];
         u64 AppletResourceUserId;
-    } in = { type, 0, *start_datetime, *end_datetime, {0}, appletGetAppletResourceUserId() };
+    } in = { type, 0, start_datetime, end_datetime, {0}, appletGetAppletResourceUserId() };
 
     u64 total_out=0;
     Result rc = serviceDispatchInOut(&g_capsuSrv, cmd_id, in, total_out,
@@ -155,7 +172,7 @@ static Result _capsuGetAlbumFileListAaeAruid(u32 cmd_id, void* entries, size_t e
     return rc;
 }
 
-static Result _capsuGetAlbumFileListAaeUidAruid(u32 cmd_id, void* entries, size_t entrysize, s32 count, u8 type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, AccountUid uid, s32 *total_entries) {
+static Result _capsuGetAlbumFileListUid(u32 cmd_id, void* entries, size_t entrysize, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, AccountUid uid, s32 *total_entries) {
     const struct {
         u8 type;
         u8 pad;
@@ -164,7 +181,7 @@ static Result _capsuGetAlbumFileListAaeUidAruid(u32 cmd_id, void* entries, size_
         u8 pad2[6];
         AccountUid uid;
         u64 AppletResourceUserId;
-    } in = { type, 0, *start_datetime, *end_datetime, {0}, uid, appletGetAppletResourceUserId() };
+    } in = { type, 0, start_datetime, end_datetime, {0}, uid, appletGetAppletResourceUserId() };
 
     u64 total_out=0;
     Result rc = serviceDispatchInOut(&g_capsuSrv, cmd_id, in, total_out,
@@ -174,6 +191,22 @@ static Result _capsuGetAlbumFileListAaeUidAruid(u32 cmd_id, void* entries, size_
     );
     if (R_SUCCEEDED(rc) && total_entries) *total_entries = total_out;
     return rc;
+}
+
+Result capsuGetAlbumFileList1AafeAruid(CapsApplicationAlbumFileEntry *entries, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, s32 *total_entries) {
+    return _capsuGetAlbumFileList(140, entries, sizeof(CapsApplicationAlbumFileEntry), count, type, start_datetime, end_datetime, total_entries);
+}
+
+Result capsuGetAlbumFileList2AafeUidAruid(CapsApplicationAlbumFileEntry *entries, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, AccountUid uid, s32 *total_entries) {
+    return _capsuGetAlbumFileListUid(141, entries, sizeof(CapsApplicationAlbumFileEntry), count, type, start_datetime, end_datetime, uid, total_entries);
+}
+
+Result capsuGetAlbumFileList3AaeAruid(CapsApplicationAlbumEntry *entries, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, s32 *total_entries) {
+    return _capsuGetAlbumFileList(142, entries, sizeof(CapsApplicationAlbumEntry), count, type, start_datetime, end_datetime, total_entries);
+}
+
+Result capsuGetAlbumFileList4AaeUidAruid(CapsApplicationAlbumEntry *entries, s32 count, CapsContentType type, CapsAlbumFileDateTime start_datetime, CapsAlbumFileDateTime end_datetime, AccountUid uid, s32 *total_entries) {
+    return _capsuGetAlbumFileListUid(143, entries, sizeof(CapsApplicationAlbumEntry), count, type, start_datetime, end_datetime, uid, total_entries);
 }
 
 static Result _capsuOpenAccessorSessionForApplication(Service* srv_out, const CapsApplicationAlbumFileEntry *entry) {
@@ -216,106 +249,7 @@ static Result _capsuReadMovieDataFromAlbumMovieReadStream(u64 stream, s64 offset
     );
 }
 
-static inline u64 _capsuMakeTimestamp(const CapsAlbumFileDateTime *datetime) {
-    struct tm tmptm = {.tm_sec = datetime->second, .tm_min = datetime->minute, .tm_hour = datetime->hour,
-                       .tm_mday = datetime->day, .tm_mon = datetime->month, .tm_year = datetime->year - 1900};
-
-    return mktime(&tmptm);
-}
-
-Result capsuGetAlbumFileListDeprecated1(CapsApplicationAlbumFileEntry *entries, s32 count, CapsContentType type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, s32 *total_entries) {
-    u64 start_timestamp = 0x386BF200;
-    u64 end_timestamp = 0xF4865700;
-
-    CapsAlbumFileDateTime default_start = capsGetDefaultStartDateTime();
-    CapsAlbumFileDateTime default_end = capsGetDefaultEndDateTime();
-
-    if (hosversionBefore(6,0,0)) { // GetAlbumFileListDeprecated0
-        if (start_datetime) start_timestamp = _capsuMakeTimestamp(start_datetime);
-        if (end_datetime) end_timestamp = _capsuMakeTimestamp(end_datetime);
-        return _capsuGetAlbumFileList0AafeAruidDeprecated(entries, sizeof(CapsApplicationAlbumFileEntry), count, type, start_timestamp, end_timestamp, total_entries);
-    }
-
-    return _capsuGetAlbumFileListAaeAruid(140, entries, sizeof(CapsApplicationAlbumFileEntry), count, type, start_datetime ? start_datetime : &default_start, end_datetime ? end_datetime : &default_end, total_entries);
-}
-
-Result capsuGetAlbumFileListDeprecated2(CapsApplicationAlbumFileEntry *entries, s32 count, CapsContentType type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, AccountUid uid, s32 *total_entries) {
-    if (hosversionBefore(6,0,0))
-        return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
-
-    CapsAlbumFileDateTime default_start = capsGetDefaultStartDateTime();
-    CapsAlbumFileDateTime default_end = capsGetDefaultEndDateTime();
-
-    return _capsuGetAlbumFileListAaeUidAruid(141, entries, sizeof(CapsApplicationAlbumFileEntry), count, type, start_datetime ? start_datetime : &default_start, end_datetime ? end_datetime : &default_end, uid, total_entries);
-}
-
-Result capsuGetAlbumFileList3(CapsApplicationAlbumEntry *entries, s32 count, CapsContentType type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, s32 *total_entries) {
-    if (hosversionBefore(7,0,0))
-        return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
-
-    CapsAlbumFileDateTime default_start = capsGetDefaultStartDateTime();
-    CapsAlbumFileDateTime default_end = capsGetDefaultEndDateTime();
-
-    return _capsuGetAlbumFileListAaeAruid(142, entries, sizeof(CapsApplicationAlbumEntry), count, type, start_datetime ? start_datetime : &default_start, end_datetime ? end_datetime : &default_end, total_entries);
-}
-
-Result capsuGetAlbumFileList4(CapsApplicationAlbumEntry *entries, s32 count, CapsContentType type, const CapsAlbumFileDateTime *start_datetime, const CapsAlbumFileDateTime *end_datetime, AccountUid uid, s32 *total_entries) {
-    if (hosversionBefore(7,0,0))
-        return MAKERESULT(Module_Libnx, LibnxError_IncompatSysVer);
-
-    CapsAlbumFileDateTime default_start = capsGetDefaultStartDateTime();
-    CapsAlbumFileDateTime default_end = capsGetDefaultEndDateTime();
-
-    return _capsuGetAlbumFileListAaeUidAruid(143, entries, sizeof(CapsApplicationAlbumEntry), count, type, start_datetime ? start_datetime : &default_start, end_datetime ? end_datetime : &default_end, uid, total_entries);
-}
-
-Result capsuDeleteAlbumFile(CapsContentType type, const CapsApplicationAlbumFileEntry *entry) {
-    return _capsuDeleteAlbumFileByAruid(103, type, entry);
-}
-
-Result capsuGetAlbumFileSize(const CapsApplicationAlbumFileEntry *entry, u64 *size) {
-    return _capsuGetAlbumFileSizeByAruid(entry, size);
-}
-
-static void _capsuProcessImageOutput(CapsLoadAlbumScreenShotImageOutputForApplication *out, s32 *width, s32 *height, CapsScreenShotAttributeForApplication *attr, void* userdata, size_t userdata_maxsize, u32 *userdata_size) {
-    if (out==NULL) return;
-
-    if (width) *width = out->width;
-    if (height) *height = out->height;
-    if (attr) memcpy(attr, &out->attr, sizeof(out->attr));
-
-    if (userdata && userdata_maxsize) {
-        memset(userdata, 0, userdata_maxsize);
-        if (userdata_maxsize > sizeof(out->appdata.userdata)) userdata_maxsize = sizeof(out->appdata.userdata);
-        if (userdata_maxsize > out->appdata.size) userdata_maxsize = out->appdata.size;
-        memcpy(userdata, out->appdata.userdata, userdata_maxsize);
-    }
-    if (userdata_size) *userdata_size = out->appdata.size > sizeof(out->appdata.userdata) ? sizeof(out->appdata.userdata) : out->appdata.size;
-}
-
-Result capsuLoadAlbumScreenShotImage(s32 *width, s32 *height, CapsScreenShotAttributeForApplication *attr, void* userdata, size_t userdata_maxsize, u32 *userdata_size, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
-    Result rc=0;
-    CapsLoadAlbumScreenShotImageOutputForApplication out={0};
-
-    rc = _capsuLoadAlbumScreenShotImageByAruid(110, &out, image, image_size, workbuf, workbuf_size, entry, option);
-    if (R_SUCCEEDED(rc)) _capsuProcessImageOutput(&out, width, height, attr, userdata, userdata_maxsize, userdata_size);
-    return rc;
-}
-
-Result capsuLoadAlbumScreenShotThumbnailImage(s32 *width, s32 *height, CapsScreenShotAttributeForApplication *attr, void* userdata, size_t userdata_maxsize, u32 *userdata_size, void* image, size_t image_size, void* workbuf, size_t workbuf_size, const CapsApplicationAlbumFileEntry *entry, const CapsScreenShotDecodeOption *option) {
-    Result rc=0;
-    CapsLoadAlbumScreenShotImageOutputForApplication out={0};
-
-    rc = _capsuLoadAlbumScreenShotImageByAruid(120, &out, image, image_size, workbuf, workbuf_size, entry, option);
-    if (R_SUCCEEDED(rc)) _capsuProcessImageOutput(&out, width, height, attr, userdata, userdata_maxsize, userdata_size);
-    return rc;
-}
-
-Result capsuPrecheckToCreateContents(CapsContentType type, u64 unk) {
-    return _capsuPrecheckToCreateContentsByAruid(type, unk);
-}
-
-Result capsuOpenAlbumMovieStream(u64 *stream, const CapsApplicationAlbumFileEntry *entry) {
+Result capsuOpenAlbumMovieReadStream(u64 *stream, const CapsApplicationAlbumFileEntry *entry) {
     Result rc=0;
 
     if (!serviceIsActive(&g_capsuAccessor)) rc = _capsuOpenAccessorSessionForApplication(&g_capsuAccessor, entry);
@@ -325,28 +259,28 @@ Result capsuOpenAlbumMovieStream(u64 *stream, const CapsApplicationAlbumFileEntr
     return rc;
 }
 
-Result capsuCloseAlbumMovieStream(u64 stream) {
+Result capsuCloseAlbumMovieReadStream(u64 stream) {
     if (!serviceIsActive(&g_capsuAccessor))
         return MAKERESULT(Module_Libnx, LibnxError_NotInitialized);
 
     return _capsuCmdInU64NoOut(&g_capsuAccessor, stream, 2002);
 }
 
-Result capsuGetAlbumMovieStreamSize(u64 stream, u64 *size) {
+Result capsuGetAlbumMovieReadStreamMovieDataSize(u64 stream, u64 *size) {
     if (!serviceIsActive(&g_capsuAccessor))
         return MAKERESULT(Module_Libnx, LibnxError_NotInitialized);
 
     return _capsuGetAlbumMovieReadStreamMovieDataSize(stream, size);
 }
 
-Result capsuReadAlbumMovieStream(u64 stream, s64 offset, void* buffer, size_t size, u64 *actual_size) {
+Result capsuReadMovieDataFromAlbumMovieReadStream(u64 stream, s64 offset, void* buffer, size_t size, u64 *actual_size) {
     if (!serviceIsActive(&g_capsuAccessor))
         return MAKERESULT(Module_Libnx, LibnxError_NotInitialized);
 
     return _capsuReadMovieDataFromAlbumMovieReadStream(stream, offset, buffer, size, actual_size);
 }
 
-Result capsuGetAlbumMovieStreamBrokenReason(u64 stream) {
+Result capsuGetAlbumMovieReadStreamBrokenReason(u64 stream) {
     if (!serviceIsActive(&g_capsuAccessor))
         return MAKERESULT(Module_Libnx, LibnxError_NotInitialized);
 
