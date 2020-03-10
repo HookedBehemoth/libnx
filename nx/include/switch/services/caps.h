@@ -27,19 +27,11 @@ typedef enum {
     CapsAlbumStorage_Sd   = 1,                  ///< Sd
 } CapsAlbumStorage;
 
-/// AlbumFileContents
-typedef enum {
-    CapsAlbumFileContents_ScreenShot      = 0,
-    CapsAlbumFileContents_Movie           = 1,
-    CapsAlbumFileContents_ExtraScreenShot = 2,
-    CapsAlbumFileContents_ExtraMovie      = 3,
-} CapsAlbumFileContents;
-
 /// ContentType
 typedef enum {
     CapsContentType_Screenshot      = 0,             ///< Album screenshots.
     CapsContentType_Movie           = 1,             ///< Album videos.
-    CapsContentType_ExtraScreenShot = 3,             ///< Image captured by the current host Application.
+    CapsContentType_ExtraScreenShot = 2,             ///< Image captured by the current host Application.
     CapsContentType_ExtraMovie      = 3,             ///< Videos recorded by the current host Application via \ref grcCreateMovieMaker.
 } CapsContentType;
 
@@ -201,8 +193,8 @@ typedef struct {
 typedef enum {
     CapsAlbumFileContentsFlag_ScreenShot      = BIT(0),   ///< Query for ScreenShot files.
     CapsAlbumFileContentsFlag_Movie           = BIT(1),   ///< Query for Movie files.
-    CapsAlbumFileContentsFlag_ExtraScreenShot = BIT(2),   ///< Query for ScreenShot files.
-    CapsAlbumFileContentsFlag_ExtraMovie      = BIT(3),   ///< Query for Movie files.
+    CapsAlbumFileContentsFlag_ExtraScreenShot = BIT(2),   ///< Query for ExtraScreenShot files.
+    CapsAlbumFileContentsFlag_ExtraMovie      = BIT(3),   ///< Query for ExtraMovie files.
 } CapsAlbumFileContentsFlag;
 
 /// AlbumCache
