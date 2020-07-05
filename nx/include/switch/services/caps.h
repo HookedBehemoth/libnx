@@ -40,7 +40,11 @@ typedef struct {
     u32 orientation;                            ///< \ref AlbumImageOrientation
     u32 unk_x8;                                 ///< Always set to 0 by official sw.
     u32 unk_xc;                                 ///< Always set to 1 by official sw.
-    u8 unk_x10[0x30];                           ///< Always set to 0 by official sw.
+    u32 length_x10;                             ///< Movie lenght in milliseconds.
+    u32 frame_count;                            ///< Frame count.
+    u32 length_x18;                             ///< Movie lenght in milliseconds. Same as length_x10.
+    u8 unk_x1c;                                 ///< Always 0xF for movies.
+    u8 unk_x1d[0x23];                           ///< Always set to 0 by official sw.
 } CapsScreenShotAttribute;
 
 /// ScreenShotAttributeForApplication. Only unk_x0 is used by official sw.
