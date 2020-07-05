@@ -360,6 +360,19 @@ Result capsaGetAlbumEntryFromApplicationAlbumEntryAruid(CapsAlbumEntry *entry, c
     return serviceDispatchInOut(&g_capsaSrv, 8021, in, *entry, .in_send_pid = true);
 }
 
+Result capsaLoadMakerNoteInfoForDebug(u64 *size, void *makernote, size_t mn_size, void *work, size_t work_size, const *CapsAlbumFileId file_id) {
+    return serviceDispatchInOut(g_capsaSrv, 50000, file_id, *size,
+        .buffer_attrs = {
+            SfBufferAttr_Out | SfBufferAttr_HipcMapAlias,
+            SfBufferAttr_Out | SfBufferAttr_HipcMapAlias
+        },
+        .buffers = {
+            {makernote, mn_size},
+            {work, work_size},
+        }
+    );
+}
+
 static Result _capsaOpenAccessorSession(Service *srv_out) {
     u64 AppletResourceUserId = appletGetAppletResourceUserId();
 
