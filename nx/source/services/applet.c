@@ -1569,7 +1569,7 @@ Result appletHolderJump(AppletHolder *h) {
 
     if (!h->creating_self) rc = _appletWaitLibraryAppletLaunchableEvent();
 
-    if (hosversionBefore(4,0,0))
+    if (true)
         rc = _appletReserveToStartAndWaitAndUnwindThis(h);
     else
         rc = _appletReserveToStartAndWait(h);
