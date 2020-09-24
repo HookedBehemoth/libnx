@@ -1199,6 +1199,10 @@ u64 appletGetAppletResourceUserId(void) {
     return g_appletResourceUserId;
 }
 
+void appletSetAppletResourceUserIdForDebug(u64 aruid) {
+    g_appletResourceUserId = aruid;
+}
+
 IPC_MAKE_CMD_IMPL_HOSVER(Result appletGetAppletResourceUserIdOfCallerApplet(u64 *out), &g_appletIWindowController, 2,  _appletCmdNoInOutU64,  (6,0,0), out)
 IPC_MAKE_CMD_IMPL(static Result _appletAcquireForegroundRights(void),                  &g_appletIWindowController, 10, _appletCmdNoIO)
 IPC_MAKE_CMD_IMPL_HOSVER(Result appletSetAppletWindowVisibility(bool flag),            &g_appletIWindowController, 20, _appletCmdInBoolNoOut, (7,0,0), flag)
@@ -1569,7 +1573,7 @@ Result appletHolderJump(AppletHolder *h) {
 
     if (!h->creating_self) rc = _appletWaitLibraryAppletLaunchableEvent();
 
-    if (hosversionBefore(4,0,0))
+    if (true)
         rc = _appletReserveToStartAndWaitAndUnwindThis(h);
     else
         rc = _appletReserveToStartAndWait(h);

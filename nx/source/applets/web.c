@@ -16,7 +16,7 @@ static Result _webLaunch(AppletHolder* holder, AppletId id, LibAppletMode mode, 
 
     if (R_SUCCEEDED(rc)) rc = libappletPushInData(holder, arg, arg_size);
 
-    if (R_SUCCEEDED(rc)) rc = appletHolderStart(holder);
+    if (R_SUCCEEDED(rc)) rc = libappletStart(holder);
 
     return rc;
 }

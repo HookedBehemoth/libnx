@@ -341,6 +341,12 @@ Result capsaGetAlbumCacheEx(CapsAlbumStorage storage, CapsAlbumFileContents cont
 Result capsaGetAlbumEntryFromApplicationAlbumEntryAruid(CapsAlbumEntry *entry, const CapsApplicationAlbumEntry *application_entry);
 
 /**
+ * @brief Extract information from decrypted makernote.
+ * @note only available with debug flag on [6.0.0+].
+ */
+Result capsaLoadMakerNoteInfoForDebug(u64 *size, void *makernote, size_t mn_size, void *work, size_t work_size, const CapsAlbumFileId *file_id);
+
+/**
  * @brief Opens an AlbumMovieStream.
  * @note This opens IAlbumAccessorSession if not previously opened, it's closed during \ref capsaExit.
  * @note Up to 4 streams can be open at the same time. Multiple streams can be open at the same time for the same \ref CapsAlbumFileId.

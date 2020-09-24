@@ -370,6 +370,9 @@ Service* appletGetServiceSession_DebugFunctions(void);
 /// Get the cached AppletResourceUserId.
 u64 appletGetAppletResourceUserId(void);
 
+/// Set the cached AppletResourceUserId.
+void appletSetAppletResourceUserIdForDebug(u64 aruid);
+
 /// Get the \ref AppletType.
 AppletType appletGetAppletType(void);
 
